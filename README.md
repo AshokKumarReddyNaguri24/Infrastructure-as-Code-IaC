@@ -4,10 +4,12 @@
 ### Part - 01
 
 Setting up the environment:
-•	Creating an AWS org named root.
+
+•	Creating an AWS org named root
+
  ![image](https://github.com/user-attachments/assets/4acbd4d2-3319-44ea-a14a-281b661357a3)
 
-•	Now, we create a IAM group for instructors with non-CLI access which means we can give the ReadOnlyAccess to them.
+•	Now, we create a IAM group for instructors with non-CLI access which means we can give the ReadOnlyAccess to them
  
 ![image](https://github.com/user-attachments/assets/57ec5fc0-08fe-4ca9-9fa2-0ead5ee3c1ac)
  
@@ -15,7 +17,7 @@ Setting up the environment:
 ![image](https://github.com/user-attachments/assets/2ea01321-458d-4324-b6e2-150a552f2cb1)
 
 
-•	Now create a VPC with DNS support and DNS hostnames enabled with suitable CIDR with the help of Terraform script.
+•	Now create a VPC with DNS support and DNS hostnames enabled with suitable CIDR with the help of Terraform script
  
 
 ![image](https://github.com/user-attachments/assets/4ea1f28a-f518-4389-b12a-e8b7414cc31d)
@@ -28,6 +30,7 @@ Setting up the environment:
 
 
 •	Creating 3 Subnets of equal sizes which can talk each other 
+
  ![image](https://github.com/user-attachments/assets/6d5fe7ae-4af8-4663-8e52-3aac229fe5a1)
  ![image](https://github.com/user-attachments/assets/c50468a3-828b-42e5-869d-88c9ee49d643)
 
@@ -63,7 +66,8 @@ Setting up the environment:
  ![image](https://github.com/user-attachments/assets/ccf57f83-ee49-4f9b-a91a-7d85db1dbcb8)
  
  
-For the above variables we have created a terraform.tfvars file and store in out local system and not hardcoding the values into the script.
+For the above variables we have created a terraform.tfvars file and store in out local system and not hardcoding the values into the script
+
  ![image](https://github.com/user-attachments/assets/3d78813e-f893-4e0c-84c8-4c55af0215d0)
  ![image](https://github.com/user-attachments/assets/19393c91-14b1-4984-9c02-7371e6ce7bed)
 
@@ -78,11 +82,13 @@ For the above variables we have created a terraform.tfvars file and store in out
 
 
 
-Part-02
+### Part-02
+
 •	Baking a new AMI ID using Ansible
+
  ![image](https://github.com/user-attachments/assets/2303428b-f1ef-41da-858a-6629c949ee1e)
 
-•	Installing all necessary packages and also included the If the CPU usage increases over 90% then the script should stop.
+•	Installing all necessary packages and also included the If the CPU usage increases over 90% then the script should stop
  
  ![image](https://github.com/user-attachments/assets/bca75e67-eaf1-4650-8154-0cf42140e5bc)
  ![image](https://github.com/user-attachments/assets/f5199e9d-66c1-4c57-a6ac-7c7879c5b81d)
