@@ -1,0 +1,103 @@
+---
+- name: Create Custom AMI with Apache, Ansible, and Flask
+  hosts: localhost
+  gather_facts: false
+  vars:
+    instance_type: t2.micro
+    region: us-east-1
+    vpc_id: "{{ lookup('env', 'TF_VAR_vpc_id') }}"
+    subnet_id: "{{ lookup('env', 'TF_VAR_subnet_id') }}"
+    security_group_id: "{{ lookup('env', 'TF_VAR_security_group_id') }}"
+    ami_name: "final-Project-{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+    base_ami: "ami-0453ec754f44f9a4a"
+
+  tasks:
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        name: "temp-instance-for-ami"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ base_ami }}"
+        region: "{{ region }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        security_group: "{{ security_group_id }}"
+        network:
+          assign_public_ip: true
+        wait: yes
+        state: present
+        user_data: |
+          #!/bin/bash
+          sudo yum update -y
+          sudo yum install -y python3 python3-pip
+          sudo yum groupinstall -y "Development Tools"
+          sudo yum install -y python3-devel
+          sudo pip3 install ansible flask flask-sqlalchemy flask-migrate mysql-connector-python pymysql psutil
+          sudo yum install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
+          echo "<h1>Hello from Group3 of Final Project</h1>" | sudo tee /var/www/html/index.html
+          # Start Python's built-in HTTP server
+          nohup python3 -m http.server 80 --directory /var/www/html &
+          # CPU Load Simulation Script
+          nohup bash -c '
+          while true; do
+            # Start stress to load CPU for 30 seconds
+            stress --cpu 2 --timeout 30 &
+            PID=$!
+            sleep 30
+            kill $PID
+
+            # Get current CPU utilization
+            CURRENT_CPU=$(top -bn1 | grep "Cpu(s)" | \
+            sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
+            awk '{print 100 - $1}')
+
+            # Check if CPU utilization exceeds 90%
+            CPU_EXCEEDS=$(echo "$CURRENT_CPU > 90" | bc -l)
+
+            if [ "$CPU_EXCEEDS" -eq 1 ]; then
+              # Stop the loop if CPU usage is over 90%
+              break
+            fi
+
+            # Maintain load for 30 seconds
+            stress --cpu 2 --timeout 30 &
+            sleep 30
+            kill $!
+          done' &
+          # Set environment variables for RDS
+          sudo echo "RDS_USERNAME=${var.rds_username}" >> /etc/environment
+          sudo echo "RDS_PASSWORD=${var.rds_password}" >> /etc/environment
+          sudo echo "RDS_DBNAME=${var.rds_dbname}" >> /etc/environment
+          sudo echo "RDSHOST_NAME=${var.rdshost_name}" >> /etc/environment
+
+      register: ec2
+
+    - name: Wait for user data script to complete
+      pause:
+        minutes: 2
+
+    - name: Create AMI
+      amazon.aws.ec2_ami:
+        instance_id: "{{ ec2.instances[0].instance_id }}"
+        name: "{{ ami_name }}"
+        region: "{{ region }}"
+        wait: yes
+        tags:
+          Name: "{{ ami_name }}"
+          Description: "AMI with Ansible, Apache, and Flask pre-installed"
+      register: ami
+
+    - name: Terminate temporary instance
+      amazon.aws.ec2_instance:
+        instance_ids: "{{ ec2.instances[0].instance_id }}"
+        region: "{{ region }}"
+        state: absent
+        wait: yes
+    - name: Save AMI ID to a file
+      copy:
+        content: "{{ ami.image_id }}"
+        dest: "/mnt/d/ami_id.txt"
+
+    - name: Output AMI ID
+      debug:
+        msg: "Created AMI with ID: {{ ami.image_id }}"

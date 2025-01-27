@@ -1,0 +1,6 @@
+instance_type = "t2.micro"
+key_name      = "FinalProject"
+rds_username  = "postgres"
+rds_password  = "securepassword123"
+rds_dbname    = "mydatabase"
+rdshost_name  = "localhost"
