@@ -1,7 +1,8 @@
 # **Deployed webservers in AWS by using Infrastructure as Code (IaC) using custom AMI ID**
 
 
-Part - 01
+### Part - 01
+
 Setting up the environment:
 •	Creating an AWS org named root.
  ![image](https://github.com/user-attachments/assets/4acbd4d2-3319-44ea-a14a-281b661357a3)
